@@ -1,0 +1,55 @@
+{
+  "name": "tfsgit-pr-injector",
+  "version": "0.1.0",
+  "description": "This module is responsible for injecting comments to a Tts Git (i.e. VSTS, TFS on premise servers) pull request. It should be consumed from a TFS build task. The comment format is simple - content, file path, line and priority. The priority is used to limit the number of commentsone can push to a PR.The module also comes with an adaptor that parses a SonarQube report and extracts code analysis issues (may be moved to a separate module in the future).",
+  "main": "./task.js",
+  "scripts": {
+    "info": "npm-scripts-info",
+    "postinstall": "typings install",
+    "pretest": "npm run clean && npm run tslint && npm run compile &&  npm run test:copyData ",
+    "clean": "rimraf ./coverage ./bin",
+    "tslint": "tslint ./src/**/*.ts --force",
+    "compile": "tsc --pretty",
+    "?test": "Run TSLint, compile TypeScript, run unit tests, and create coverage reports.",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec ./bin/test/*.js",
+    "test:copyData": "ncp ./src/test/data ./bin/test/data",
+    "posttest": "npm run remap:lcov && npm run remap:html",
+    "remap:lcov": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov-ts.info",
+    "remap:html": "remap-istanbul --input coverage/coverage.json --type html --output coverage/lcov-report-ts",
+    "?test:watch": "Watch for changed compiled TypeScript files and perform unit tests. Press Ctrl-Shift-B in VSCode to compile TypeScript.",
+    "test:watch": "mocha --watch ./bin/*/*.js",
+    "?cleanall": "Removes the node_modules & typings, all compiled TypeScript files, and coverage reports.",
+    "cleanall": "rimraf ./coverage ./bin ./typings ./node_modules"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/vsts-task-lib"
+  },
+  "keywords": [
+    "vsts",
+    "pr",
+    "comments"
+  ],
+  "author": "Microsoft",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bgavrilMS/tfsgit-pr-injector"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.3",
+    "mocha": "^2.5.3",
+    "ncp": "^2.0.0",
+    "remap-istanbul": "^0.6.4",
+    "rimraf": "^2.5.2",
+    "tslint": "^3.11.0",
+    "tslint-microsoft-contrib": "^2.0.7",
+    "typescript": "^1.8.10",
+    "typings": "^1.1.0"
+  },
+  "dependencies": {
+    "fs": "0.0.2",
+    "npm-scripts-info": "^0.3.6",
+    "util": "^0.10.3"
+  }
+}
