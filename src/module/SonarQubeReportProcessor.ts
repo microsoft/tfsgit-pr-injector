@@ -40,12 +40,9 @@ export class SonarQubeReportProcessor {
             throw new ReferenceError('Report path is null or empty');
         }
 
-        return this.ProcessSonarQubeReport(reportPath);
-    }
-
-    private ProcessSonarQubeReport(reportPath: string): Message[] {
-
-        if (!fs.existsSync(reportPath)) {
+        try {
+            fs.accessSync(reportPath, fs.F_OK);
+        } catch (e) {
             throw new PRInjectorError('Could not find ' + reportPath + ' - did the SonarQube analysis complete?');
         }
 
@@ -55,7 +52,7 @@ export class SonarQubeReportProcessor {
         try {
             sonarQubeReport = JSON.parse(sqReportContent);
         } catch (e) {
-            throw new PRInjectorError('Could not parse the sonar report file. The error is: ' + e.message);
+            throw new PRInjectorError('Could not parse the SonarQube report file. The error is: ' + e.message);
         }
 
         let componentMap = this.BuildComponentMap(sonarQubeReport);
@@ -82,7 +79,7 @@ export class SonarQubeReportProcessor {
 
         this.logger.LogDebug(
             util.format(
-                'The SonarQube report contains %d components with path',
+                'The SonarQube report contains %d components with paths',
                 Object.keys(map).length));
 
         return map;

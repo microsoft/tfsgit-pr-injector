@@ -65,7 +65,8 @@ export class Message {
     }
 
     /**
-     * The priority of the message, used to limit the number of messages that get posted 
+     * The priority of the message, used to limit the number of messages that get posted. 
+     * A lower number means a message is more likely to be posted.
      * 
      * @readonly
      * @type {number}

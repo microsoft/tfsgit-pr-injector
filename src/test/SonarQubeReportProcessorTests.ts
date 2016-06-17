@@ -8,8 +8,9 @@ import { Message } from '../module/Message';
 
 import { TestLogger } from './TestLogger';
 
-import chai = require('chai');
-import path = require('path');
+import * as chai from 'chai';
+import * as path from 'path';
+import * as fs from 'fs';
 
 function VerifyMessage(
     actualMessage: Message,
@@ -45,6 +46,7 @@ describe('The SonarQube Report Processor', () => {
 
         it('the report is not in json format', () => {
             let invalidJsonReport: string = path.join(__dirname, 'data', 'invalid-sonar-report.json');
+            fs.accessSync(invalidJsonReport, fs.F_OK);
             chai.expect(() => sqReportProcessor.FetchCommentsFromReport(invalidJsonReport)).to.throw(PRInjectorError);
         });
     });
@@ -80,12 +82,16 @@ describe('The SonarQube Report Processor', () => {
         });
 
         it('the report is valid', () => {
+
+            // Arrange
             let validReport = path.join(__dirname, 'data', 'sonar-report.json');
             let testLogger = new TestLogger();
 
+            // Act
             let sqReportProcessor: SonarQubeReportProcessor = new SonarQubeReportProcessor(testLogger);
             let messages: Message[] = sqReportProcessor.FetchCommentsFromReport(validReport);
 
+            // Assert
             chai.expect(messages).to.have.length(3, 'There are 3 new issues in the report');
 
             // valid issue
