@@ -1,9 +1,7 @@
 /// <reference path="../../typings/index.d.ts" />
 
-import fs = require('fs');
-import util = require('util');
-
-import * as ext from './Extensions.ts';
+import * as fs from 'fs';
+import * as util from 'util';
 
 import { PRInjectorError } from './PRInjectorError';
 import { Message } from './Message';
@@ -59,8 +57,8 @@ export class SonarQubeReportProcessor {
         return this.BuildMessages(sonarQubeReport, componentMap);
     }
 
-    private BuildComponentMap(sonarQubeReport: any): ext.Map<string> {
-        let map: ext.Map<string> = {};
+    private BuildComponentMap(sonarQubeReport: any): Map<string, string> {
+        let map: Map<string, string> = new Map();
 
         if (!sonarQubeReport.components) {
             this.logger.LogInfo('The SonarQube report is empty as it lists no components');
@@ -73,24 +71,24 @@ export class SonarQubeReportProcessor {
             }
 
             if (component.path) {
-                map[component.key] = component.path;
+                map.set(component.key, component.path);
             }
         }
 
         this.logger.LogDebug(
             util.format(
                 'The SonarQube report contains %d components with paths',
-                Object.keys(map).length));
+                map.size));
 
         return map;
     }
 
-    private BuildMessages(sonarQubeReport: any, componentMap: ext.Map<string>): Message[] {
+    private BuildMessages(sonarQubeReport: any, componentMap: Map<string, string>): Message[] {
 
         let messages: Message[] = [];
 
         // no components, i.e. empty report
-        if (Object.keys(componentMap).length === 0) {
+        if (componentMap.size === 0) {
             return messages;
         }
 
@@ -116,7 +114,7 @@ export class SonarQubeReportProcessor {
                     util.format('Invalid SonarQube report - an issue does not have the component attribute. Content "%s"', issue.content));
             }
 
-            let path: string = componentMap[issueComponent];
+            let path: string = componentMap.get(issueComponent);
 
             if (!path) {
                 throw new PRInjectorError(
