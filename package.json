@@ -50,6 +50,7 @@
   "dependencies": {
     "fs": "0.0.2",
     "npm-scripts-info": "^0.3.6",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "vso-node-api": "^5.0.5"
   }
 }
