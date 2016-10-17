@@ -2,7 +2,6 @@
   "globalDependencies": {
     "chai": "registry:dt/chai#3.4.0+20160317120654",
     "mocha": "registry:dt/mocha#2.2.5+20160317120654",
-    "node": "registry:dt/node#6.0.0+20160613154055",
-    "vso-node-api": "registry:dt/vso-node-api#0.3.2+20160724062053"
+    "node": "registry:dt/node#6.0.0+20160613154055"
   }
 }
