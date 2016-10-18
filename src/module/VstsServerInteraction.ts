@@ -10,13 +10,13 @@ import { GitPullRequestCommentThread, Comment, GitPullRequestCommentThreadContex
 import { ILogger } from './ILogger';
 
 export interface IVstsServerInteraction {
-    getThreads(): Promise<GitPullRequestCommentThread[]>;
+    getThreads(): GitPullRequestCommentThread[];
 
-    createThread(line:number): Promise<GitPullRequestCommentThread>;
+    createThread(line:number): GitPullRequestCommentThread;
 
-    postCommentInThread(threadId: number, commentText: string): Promise<GitPullRequestCommentThread>;
+    postCommentInThread(threadId: number, commentText: string): GitPullRequestCommentThread;
 
-    deleteComment(threadId: number, commentId: number): Promise<GitPullRequestCommentThread>;
+    deleteComment(threadId: number, commentId: number): void;
 }
 
 export class VstsServerInteraction /*implements IVstsServerInteraction*/ {
