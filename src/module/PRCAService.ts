@@ -2,24 +2,23 @@
 
 import * as web from 'vso-node-api/WebApi';
 import { WebApi } from 'vso-node-api/WebApi';
-
 import { IGitApi } from 'vso-node-api/GitApi';
 import * as gitInterfaces from 'vso-node-api/interfaces/GitInterfaces';
 import { GitPullRequestCommentThread, Comment, GitPullRequestCommentThreadContext } from 'vso-node-api/interfaces/GitInterfaces';
 
+import {Message} from './Message';
 import { ILogger } from './ILogger';
+import { IPRCAService} from './IPRCAService';
 
-export interface IVstsServerInteraction {
-    getThreads(): GitPullRequestCommentThread[];
 
-    createThread(line:number): GitPullRequestCommentThread;
-
-    postCommentInThread(threadId: number, commentText: string): GitPullRequestCommentThread;
-
-    deleteComment(threadId: number, commentId: number): void;
-}
-
-export class VstsServerInteraction /*implements IVstsServerInteraction*/ {
+/**
+ * PR Code Analysis service 
+ * 
+ * @export
+ * @class PRCAService
+ * @implements {IPRCAService}
+ */
+export class PRCAService implements IPRCAService {
 
     private logger: ILogger;
 
@@ -31,4 +30,20 @@ export class VstsServerInteraction /*implements IVstsServerInteraction*/ {
         this.logger = logger;
     }
 
+
+    public createCodeAnalysisThreads(messages: Message[]): void {
+        throw new Error('Not implemented');
+    }
+
+
+
+    public deleteCodeAnalysisComments(): void {
+        throw new Error('Not implemented');
+    }
+
+
+
+    public getModifiedFilesInPr(): string[] {
+        throw new Error('Not implemented');
+    }
 }
