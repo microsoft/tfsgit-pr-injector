@@ -1,8 +1,5 @@
 /// <reference path="../../typings/index.d.ts" />
 
-import * as fs from 'fs';
-import * as util from 'util';
-
 import { Message } from '../module/Message';
 import { ISonarQubeReportProcessor } from '../module/ISonarQubeReportProcessor';
 
