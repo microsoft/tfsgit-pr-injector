@@ -6,15 +6,10 @@ import * as util from 'util';
 import { PRInjectorError } from './PRInjectorError';
 import { Message } from './Message';
 import { ILogger } from './ILogger';
+import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
 
 
-/**
- * Responsible for processing a SonarQube report to extract code analysis issues from it
- * 
- * @export
- * @class SonarQubeReportProcessor
- */
-export class SonarQubeReportProcessor {
+export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     private logger: ILogger;
 
@@ -26,12 +21,8 @@ export class SonarQubeReportProcessor {
         this.logger = logger;
     }
 
-    /**
-     * Extracts the messages to be posted from a SonarQube report file
-     * 
-     * @param {string} reportPath (description)
-     * @returns {Message[]} (description)
-     */
+    /* Interface methods */
+
     public FetchCommentsFromReport(reportPath: string): Message[] {
 
         if (!reportPath) {
@@ -56,6 +47,8 @@ export class SonarQubeReportProcessor {
         let componentMap = this.BuildComponentMap(sonarQubeReport);
         return this.BuildMessages(sonarQubeReport, componentMap);
     }
+
+    /* Helper methods */
 
     private BuildComponentMap(sonarQubeReport: any): Map<string, string> {
         let map: Map<string, string> = new Map();
