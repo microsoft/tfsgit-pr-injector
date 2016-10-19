@@ -18,15 +18,15 @@ export interface IPRCAService {
      * 
      * @memberOf IPRCAService
      */
-    createCodeAnalysisThreads(messages: Message[]): void;
+    createCodeAnalysisThreads(messages: Message[]): Promise<void>;
 
     /**
-     * Deletes comments that were created by this service.
-     * Remark: users can add other comments to a PRCA thread, this method only deletes the original comments
+     * Deletes comments associated with threads created by this module
+     * Remark: users can add other comments to a PRCA thread, this method will delete them
      * 
      * @memberOf IPRCAService
      */
-    deleteCodeAnalysisComments(): void;
+    deleteCodeAnalysisComments(): Promise<void>;
 
 
     /**
@@ -36,5 +36,5 @@ export interface IPRCAService {
      * 
      * @memberOf IPRCAService
      */
-    getModifiedFilesInPr(): string[];
+    getModifiedFilesInPr(): Promise<string[]>;
 }
