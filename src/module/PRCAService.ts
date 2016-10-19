@@ -18,7 +18,7 @@ import { IPRCAService} from './IPRCAService';
  * @class PRCAService
  * @implements {IPRCAService}
  */
-export class PRCAService implements IPRCAService {
+export class PRCAService /*implements IPRCAService*/ {
 
     private logger: ILogger;
 
@@ -32,6 +32,10 @@ export class PRCAService implements IPRCAService {
 
 
     public createCodeAnalysisThreads(messages: Message[]): void {
+        if (messages == null || messages == undefined) {
+            throw new ReferenceError('messages');
+        }
+
         throw new Error('Not implemented');
     }
 

@@ -34,6 +34,10 @@ export class Message {
         this._priority = priority;
     }
 
+    public static compare(a: Message, b: Message): number {
+            return a.priority - b.priority;
+    }
+
     /**
      * The textual content of the message that will be posted. MD format might be supported
      * 
