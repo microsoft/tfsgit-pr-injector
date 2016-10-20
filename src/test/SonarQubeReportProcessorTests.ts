@@ -1,124 +1,124 @@
-/**
- * Tests for the CommentInjector protocol.
- */
+// /**
+//  * Tests for the CommentInjector protocol.
+//  */
 
-import { SonarQubeReportProcessor } from '../module/SonarQubeReportProcessor';
-import { PRInjectorError } from '../module/PRInjectorError';
-import { Message } from '../module/Message';
+// import { SonarQubeReportProcessor } from '../module/SonarQubeReportProcessor';
+// import { PRInjectorError } from '../module/PRInjectorError';
+// import { Message } from '../module/Message';
 
-import { TestLogger } from './TestLogger';
+// import { TestLogger } from './TestLogger';
 
-import * as chai from 'chai';
-import * as path from 'path';
-import * as fs from 'fs';
+// import * as chai from 'chai';
+// import * as path from 'path';
+// import * as fs from 'fs';
 
-function VerifyMessage(
-    actualMessage: Message,
-    expectedContent: string,
-    expectedFile: string,
-    expectedLine: number,
-    expectedPriority: number) {
+// function VerifyMessage(
+//     actualMessage: Message,
+//     expectedContent: string,
+//     expectedFile: string,
+//     expectedLine: number,
+//     expectedPriority: number) {
 
-    chai.expect(actualMessage.content).to.equal(expectedContent, 'Content mismatch');
-    chai.expect(actualMessage.file).to.equal(expectedFile, 'File mismatch');
-    chai.expect(actualMessage.line).to.equal(expectedLine, 'Line mismatch');
-    chai.expect(actualMessage.priority).to.equal(expectedPriority, 'Priority mismatch');
-}
+//     chai.expect(actualMessage.content).to.equal(expectedContent, 'Content mismatch');
+//     chai.expect(actualMessage.file).to.equal(expectedFile, 'File mismatch');
+//     chai.expect(actualMessage.line).to.equal(expectedLine, 'Line mismatch');
+//     chai.expect(actualMessage.priority).to.equal(expectedPriority, 'Priority mismatch');
+// }
 
-describe('The SonarQube Report Processor', () => {
-    context('Fails when', () => {
-        let sqReportProcessor: SonarQubeReportProcessor;
-        let testLogger: TestLogger;
+// describe('The SonarQube Report Processor', () => {
+//     context('Fails when', () => {
+//         let sqReportProcessor: SonarQubeReportProcessor;
+//         let testLogger: TestLogger;
 
-        beforeEach(() => {
-            testLogger = new TestLogger();
-            sqReportProcessor = new SonarQubeReportProcessor(testLogger);
-        });
+//         beforeEach(() => {
+//             testLogger = new TestLogger();
+//             sqReportProcessor = new SonarQubeReportProcessor(testLogger);
+//         });
 
-        it('the report path is null', () => {
-            chai.expect(() => sqReportProcessor.FetchCommentsFromReport(null)).to.throw(ReferenceError);
-        });
+//         it('the report path is null', () => {
+//             chai.expect(() => sqReportProcessor.FetchCommentsFromReport(null)).to.throw(ReferenceError);
+//         });
 
-        it('the report is not on disk', () => {
-            let nonExistentReport: string = '/tmp/bogus.txt';
-            chai.expect(() => sqReportProcessor.FetchCommentsFromReport(nonExistentReport)).to.throw(PRInjectorError);
-        });
+//         it('the report is not on disk', () => {
+//             let nonExistentReport: string = '/tmp/bogus.txt';
+//             chai.expect(() => sqReportProcessor.FetchCommentsFromReport(nonExistentReport)).to.throw(PRInjectorError);
+//         });
 
-        it('the report is not in json format', () => {
-            let invalidJsonReport: string = path.join(__dirname, 'data', 'invalid-sonar-report.json');
-            fs.accessSync(invalidJsonReport, fs.F_OK);
-            chai.expect(() => sqReportProcessor.FetchCommentsFromReport(invalidJsonReport)).to.throw(PRInjectorError);
-        });
-    });
+//         it('the report is not in json format', () => {
+//             let invalidJsonReport: string = path.join(__dirname, 'data', 'invalid-sonar-report.json');
+//             fs.accessSync(invalidJsonReport, fs.F_OK);
+//             chai.expect(() => sqReportProcessor.FetchCommentsFromReport(invalidJsonReport)).to.throw(PRInjectorError);
+//         });
+//     });
 
-    context('Succeeds when', () => {
-        let sqReportProcessor: SonarQubeReportProcessor;
-        let testLogger: TestLogger;
+//     context('Succeeds when', () => {
+//         let sqReportProcessor: SonarQubeReportProcessor;
+//         let testLogger: TestLogger;
 
-        beforeEach(() => {
-            testLogger = new TestLogger();
-            sqReportProcessor = new SonarQubeReportProcessor(testLogger);
-        });
+//         beforeEach(() => {
+//             testLogger = new TestLogger();
+//             sqReportProcessor = new SonarQubeReportProcessor(testLogger);
+//         });
 
-        it('the report has no components', () => {
-            let emptyReport = path.join(__dirname, 'data', 'empty-sonar-report.json');
-            var messages = sqReportProcessor.FetchCommentsFromReport(emptyReport);
+//         it('the report has no components', () => {
+//             let emptyReport = path.join(__dirname, 'data', 'empty-sonar-report.json');
+//             var messages = sqReportProcessor.FetchCommentsFromReport(emptyReport);
 
-            chai.expect(messages).to.have.length(0, 'There are no issues');
-        });
+//             chai.expect(messages).to.have.length(0, 'There are no issues');
+//         });
 
-        it('the report has no new components', () => {
-            let report = path.join(__dirname, 'data', 'sonar-no-new-issues.json');
-            var messages = sqReportProcessor.FetchCommentsFromReport(report);
+//         it('the report has no new components', () => {
+//             let report = path.join(__dirname, 'data', 'sonar-no-new-issues.json');
+//             var messages = sqReportProcessor.FetchCommentsFromReport(report);
 
-            chai.expect(messages).to.have.length(0, 'There are no issues');
-        });
+//             chai.expect(messages).to.have.length(0, 'There are no issues');
+//         });
 
-        it('the report has no issues', () => {
-            let emptyReport = path.join(__dirname, 'data', 'empty-sonar-report.json');
-            var messages = sqReportProcessor.FetchCommentsFromReport(emptyReport);
+//         it('the report has no issues', () => {
+//             let emptyReport = path.join(__dirname, 'data', 'empty-sonar-report.json');
+//             var messages = sqReportProcessor.FetchCommentsFromReport(emptyReport);
 
-            chai.expect(messages).to.have.length(0, 'There are no issues');
-        });
+//             chai.expect(messages).to.have.length(0, 'There are no issues');
+//         });
 
-        it('the report is valid', () => {
+//         it('the report is valid', () => {
 
-            // Arrange
-            let validReport = path.join(__dirname, 'data', 'sonar-report.json');
-            let testLogger = new TestLogger();
+//             // Arrange
+//             let validReport = path.join(__dirname, 'data', 'sonar-report.json');
+//             let testLogger = new TestLogger();
 
-            // Act
-            let sqReportProcessor: SonarQubeReportProcessor = new SonarQubeReportProcessor(testLogger);
-            let messages: Message[] = sqReportProcessor.FetchCommentsFromReport(validReport);
+//             // Act
+//             let sqReportProcessor: SonarQubeReportProcessor = new SonarQubeReportProcessor(testLogger);
+//             let messages: Message[] = sqReportProcessor.FetchCommentsFromReport(validReport);
 
-            // Assert
-            chai.expect(messages).to.have.length(3, 'There are 3 new issues in the report');
+//             // Assert
+//             chai.expect(messages).to.have.length(3, 'There are 3 new issues in the report');
 
-            // valid issue
-            VerifyMessage(
-                messages[0],
-                'Remove this unused "x" local variable. (squid:S1481)',
-                'src/main/java/com/mycompany/app/App.java',
-                12,
-                3);
+//             // valid issue
+//             VerifyMessage(
+//                 messages[0],
+//                 'Remove this unused "x" local variable. (squid:S1481)',
+//                 'src/main/java/com/mycompany/app/App.java',
+//                 12,
+//                 3);
 
-            // another valid issue in a different file
-            VerifyMessage(
-                messages[1],
-                'Replace this usage of System.out or System.err by a logger. (squid:S106)',
-                'src/test/java/com/mycompany/app/AppTest.java',
-                11,
-                4);
+//             // another valid issue in a different file
+//             VerifyMessage(
+//                 messages[1],
+//                 'Replace this usage of System.out or System.err by a logger. (squid:S106)',
+//                 'src/test/java/com/mycompany/app/AppTest.java',
+//                 11,
+//                 4);
 
-            // issue with no priority
-            VerifyMessage(
-                messages[2],
-                'Bad code right here... (squid:S106)',
-                'src/main/java/com/mycompany/app/App.java',
-                15,
-                6);
+//             // issue with no priority
+//             VerifyMessage(
+//                 messages[2],
+//                 'Bad code right here... (squid:S106)',
+//                 'src/main/java/com/mycompany/app/App.java',
+//                 15,
+//                 6);
 
-            chai.expect(testLogger.Warnings).to.have.length(2, 'There should be warnings for the issues with invalid line numbers');
-        });
-    });
-});
+//             chai.expect(testLogger.Warnings).to.have.length(2, 'There should be warnings for the issues with invalid line numbers');
+//         });
+//     });
+// });
