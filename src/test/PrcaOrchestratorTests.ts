@@ -188,12 +188,12 @@ describe('The PRCA Orchestrator', () => {
             let orchestrator: PrcaOrchestrator =
                 new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
 
-            let messages = new Array<Message>(orchestrator.messageLimit + 50);
-            // Set (messageLimit + 50) messages to return
-            for (var i = 0; i < orchestrator.messageLimit + 50; i++) {
+            let messages = new Array<Message>(orchestrator.getMessageLimit() + 50);
+            // Set (getMessageLimit() + 50) messages to return
+            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i++) {
                 let message: Message;
                 // Some of the messages will have a higher priority, so that we can check that they have all been posted
-                if (i < orchestrator.messageLimit + 30) {
+                if (i < orchestrator.getMessageLimit() + 30) {
                     message = new Message('foo', 'src/main/java/com/mycompany/app/App.java', 1, 2);
                 } else {
                     message = new Message('bar', 'src/main/java/com/mycompany/app/App.java', 1, 1);
@@ -206,7 +206,7 @@ describe('The PRCA Orchestrator', () => {
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
-                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.getMessageLimit(), 'Correct number of comments');
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
@@ -225,11 +225,11 @@ describe('The PRCA Orchestrator', () => {
             let orchestrator: PrcaOrchestrator =
                 new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
 
-            let messages = new Array<Message>(orchestrator.messageLimit + 50);
-            // Set (messageLimit + 50) messages to return
-            for (var i = 0; i < orchestrator.messageLimit + 50; i++) {
+            let messages = new Array<Message>(orchestrator.getMessageLimit() + 50);
+            // Set (getMessageLimit() + 50) messages to return
+            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i++) {
                 let message: Message;
-                // (messageLimit + 20 of the messages are high priority, so we expect all posted messages to be at the highest priority
+                // (getMessageLimit() + 20 of the messages are high priority, so we expect all posted messages to be at the highest priority
                 if (i < 30) {
                     message = new Message('foo', 'src/main/java/com/mycompany/app/App.java', 1, 2);
                 } else {
@@ -244,14 +244,14 @@ describe('The PRCA Orchestrator', () => {
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
-                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.getMessageLimit(), 'Correct number of comments');
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
                             return message.content == 'bar';
                         }
                     );
-                    expect(priorityOneThreads).to.have.length(orchestrator.messageLimit, 'All posted comments were high priority');
+                    expect(priorityOneThreads).to.have.length(orchestrator.getMessageLimit(), 'All posted comments were high priority');
                 });
         });
 
@@ -275,14 +275,14 @@ describe('The PRCA Orchestrator', () => {
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
-                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.getMessageLimit(), 'Correct number of comments');
 
                     var correctThreads = server.getSavedMessages().filter(
                         (message: Message) => {
                             return message.content == 'bar';
                         }
                     );
-                    expect(correctThreads).to.have.length(orchestrator.messageLimit, 'All posted comments had correct content');
+                    expect(correctThreads).to.have.length(orchestrator.getMessageLimit(), 'All posted comments had correct content');
                 });
         });
 

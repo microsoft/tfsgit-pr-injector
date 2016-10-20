@@ -19,7 +19,7 @@ export class PrcaOrchestrator {
     private sqReportProcessor:ISonarQubeReportProcessor;
     private PrcaService:IPrcaService;
 
-    private _messageLimit = 100;
+    private messageLimit: number = 100;
 
     constructor(private logger:ILogger, sqReportProcessor:ISonarQubeReportProcessor, PrcaService:IPrcaService, messageLimit?: number) {
         if (sqReportProcessor === null || sqReportProcessor === undefined) {
@@ -33,7 +33,7 @@ export class PrcaOrchestrator {
         this.PrcaService = PrcaService;
 
         if (messageLimit != null && messageLimit != undefined) {
-            this._messageLimit = messageLimit;
+            this.messageLimit = messageLimit;
         }
     }
 
@@ -41,11 +41,10 @@ export class PrcaOrchestrator {
      * An upper limit on the number of messages that will be posted to the pull request.
      * The first n messages by priority will be posted.
      *
-     * @readonly
-     * @type {string}
+     * @returns {number}
      */
-    get messageLimit(): number {
-        return this._messageLimit;
+    public getMessageLimit(): number {
+        return this.messageLimit;
     }
 
     /**
@@ -104,10 +103,10 @@ export class PrcaOrchestrator {
         result = result.sort(Message.compare);
 
         // Truncate to the first 100 to reduce perf and experience impact of being flooded with messages
-        if (result.length > this._messageLimit) {
-            this.logger.LogDebug(`The number of messages posted is limited to ${this._messageLimit}. ${result.length - this._messageLimit} messages will not be posted.`);
+        if (result.length > this.messageLimit) {
+            this.logger.LogDebug(`The number of messages posted is limited to ${this.messageLimit}. ${result.length - this.messageLimit} messages will not be posted.`);
         }
-        result = result.slice(0, this._messageLimit);
+        result = result.slice(0, this.messageLimit);
 
         return result;
     }
