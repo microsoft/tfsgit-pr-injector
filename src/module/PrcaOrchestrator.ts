@@ -19,9 +19,9 @@ export class PrcaOrchestrator {
     private sqReportProcessor:ISonarQubeReportProcessor;
     private PrcaService:IPrcaService;
 
-    public static MessageLimit = 100;
+    private _messageLimit = 100;
 
-    constructor(private logger:ILogger, sqReportProcessor:ISonarQubeReportProcessor, PrcaService:IPrcaService) {
+    constructor(private logger:ILogger, sqReportProcessor:ISonarQubeReportProcessor, PrcaService:IPrcaService, messageLimit?: number) {
         if (sqReportProcessor === null || sqReportProcessor === undefined) {
             throw new ReferenceError('sqReportProcessor');
         }
@@ -31,10 +31,28 @@ export class PrcaOrchestrator {
 
         this.sqReportProcessor = sqReportProcessor;
         this.PrcaService = PrcaService;
+
+        if (messageLimit != null && messageLimit != undefined) {
+            this._messageLimit = messageLimit;
+        }
+    }
+
+    /**
+     * An upper limit on the number of messages that will be posted to the pull request.
+     * The first n messages by priority will be posted.
+     *
+     * @readonly
+     * @type {string}
+     */
+    get messageLimit(): number {
+        return this._messageLimit;
     }
 
     /**
      * Fetches messages from the SonarQube report, filters and sorts them, then posts them to the pull request.
+     *
+     * @param sqReportPath
+     * @returns {Promise<void>}
      */
     public postSonarQubeIssuesToPullRequest(sqReportPath: string): Promise<void> {
         this.logger.LogDebug(`SonarQube report path: ${sqReportPath}`);
@@ -86,10 +104,10 @@ export class PrcaOrchestrator {
         result = result.sort(Message.compare);
 
         // Truncate to the first 100 to reduce perf and experience impact of being flooded with messages
-        if (result.length > PrcaOrchestrator.MessageLimit) {
-            this.logger.LogDebug(`A maximum of 100 messages are posted. ${result.length - PrcaOrchestrator.MessageLimit} messages will not be posted.`);
+        if (result.length > this._messageLimit) {
+            this.logger.LogDebug(`The number of messages posted is limited to ${this._messageLimit}. ${result.length - this._messageLimit} messages will not be posted.`);
         }
-        result = result.slice(0, PrcaOrchestrator.MessageLimit);
+        result = result.slice(0, this._messageLimit);
 
         return result;
     }

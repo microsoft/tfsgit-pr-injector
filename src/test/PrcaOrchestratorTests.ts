@@ -33,24 +33,24 @@ describe('The PRCA Orchestrator', () => {
         let testLogger: TestLogger;
         let server: MockPrcaService;
         let sqReportProcessor:SonarQubeReportProcessor;
+        let orchestrator:PrcaOrchestrator; // object under test
 
         beforeEach(() => {
             testLogger = new TestLogger();
             server = new MockPrcaService();
             sqReportProcessor = new SonarQubeReportProcessor(testLogger);
+            orchestrator = new PrcaOrchestrator(testLogger, sqReportProcessor, server);
         });
 
         it('is called with invalid arguments', () => {
             // Arrange
             var expectedMessages: Message[] = [fakeMessage, fakeMessage];
             server.createCodeAnalysisThreads(expectedMessages); // post some messages to test that the orchestrator doesn't delete them
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
             
             // Act & Assert
-            expect(server.getSavedMessages()).to.eql(expectedMessages, 'Expected existing PRCA messages to still be on the server');
             expect(() => orchestrator.postSonarQubeIssuesToPullRequest(undefined)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
             expect(() => orchestrator.postSonarQubeIssuesToPullRequest(null)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
+            expect(server.getSavedMessages()).to.eql(expectedMessages, 'Expected existing PRCA messages to still be on the server');
         });
 
         it('fails retrieving the list of files in the pull request', () => {
@@ -61,9 +61,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     return Promise.reject('Should not have finished successfully');
@@ -82,9 +79,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     return Promise.reject('Should not have finished successfully');
@@ -103,9 +97,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     return Promise.reject('Should not have finished successfully');
@@ -121,11 +112,13 @@ describe('The PRCA Orchestrator', () => {
         let testLogger: TestLogger;
         let server: MockPrcaService;
         let sqReportProcessor: SonarQubeReportProcessor;
+        let orchestrator:PrcaOrchestrator; // object under test
 
         beforeEach(() => {
             testLogger = new TestLogger();
             server = new MockPrcaService();
             sqReportProcessor = new SonarQubeReportProcessor(testLogger);
+            orchestrator = new PrcaOrchestrator(testLogger, sqReportProcessor, server);
         });
 
         it('has no comments to post (no issues reported)', () => {
@@ -137,9 +130,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
@@ -155,9 +145,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-new-issues.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
@@ -173,9 +160,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
@@ -189,9 +173,6 @@ describe('The PRCA Orchestrator', () => {
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, sqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
@@ -199,18 +180,20 @@ describe('The PRCA Orchestrator', () => {
                 });
         });
 
-        it(`has more than ${PrcaOrchestrator.MessageLimit} mixed-priority comments to post`, () => {
+        it(`has more comments to post than the limit allows`, () => {
             // Arrange
             server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
-
             let mockSqReportProcessor: MockSonarQubeReportProcessor = new MockSonarQubeReportProcessor();
-            let messages = new Array<Message>(PrcaOrchestrator.MessageLimit + 50);
-            // Set (MessageLimit + 50) messages to return
-            for (var i = 0; i < PrcaOrchestrator.MessageLimit + 50; i++) {
+            let orchestrator: PrcaOrchestrator =
+                new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
+
+            let messages = new Array<Message>(orchestrator.messageLimit + 50);
+            // Set (messageLimit + 50) messages to return
+            for (var i = 0; i < orchestrator.messageLimit + 50; i++) {
                 let message: Message;
                 // Some of the messages will have a higher priority, so that we can check that they have all been posted
-                if (i < PrcaOrchestrator.MessageLimit + 30) {
+                if (i < orchestrator.messageLimit + 30) {
                     message = new Message('foo', 'src/main/java/com/mycompany/app/App.java', 1, 2);
                 } else {
                     message = new Message('bar', 'src/main/java/com/mycompany/app/App.java', 1, 1);
@@ -220,13 +203,10 @@ describe('The PRCA Orchestrator', () => {
             mockSqReportProcessor.SetCommentsToReturn(messages);
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
-
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
-                    expect(server.getSavedMessages()).to.have.length(PrcaOrchestrator.MessageLimit, 'Correct number of comments');
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
@@ -237,17 +217,19 @@ describe('The PRCA Orchestrator', () => {
                 });
         });
 
-        it(`has more than ${PrcaOrchestrator.MessageLimit} high-priority comments to post`, () => {
+        it(`has more high-priority comments to post than the limit allows`, () => {
             // Arrange
             server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
-
             let mockSqReportProcessor: MockSonarQubeReportProcessor = new MockSonarQubeReportProcessor();
-            let messages = new Array<Message>(PrcaOrchestrator.MessageLimit + 50);
-            // Set (MessageLimit + 50) messages to return
-            for (var i = 0; i < PrcaOrchestrator.MessageLimit + 50; i++) {
+            let orchestrator: PrcaOrchestrator =
+                new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
+
+            let messages = new Array<Message>(orchestrator.messageLimit + 50);
+            // Set (messageLimit + 50) messages to return
+            for (var i = 0; i < orchestrator.messageLimit + 50; i++) {
                 let message: Message;
-                // (MessageLimit) + 20 of the messages are high priority, so we expect all posted messages to be at the highest priority
+                // (messageLimit + 20 of the messages are high priority, so we expect all posted messages to be at the highest priority
                 if (i < 30) {
                     message = new Message('foo', 'src/main/java/com/mycompany/app/App.java', 1, 2);
                 } else {
@@ -258,21 +240,52 @@ describe('The PRCA Orchestrator', () => {
             mockSqReportProcessor.SetCommentsToReturn(messages);
 
             // Act
-            let orchestrator: PrcaOrchestrator =
-                new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
 
             return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
                 .then(() => {
                     // Assert
-                    expect(server.getSavedMessages()).to.have.length(PrcaOrchestrator.MessageLimit, 'Correct number of comments');
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
                             return message.content == 'bar';
                         }
                     );
-                    expect(priorityOneThreads).to.have.length(PrcaOrchestrator.MessageLimit, 'All posted comments were high priority');
+                    expect(priorityOneThreads).to.have.length(orchestrator.messageLimit, 'All posted comments were high priority');
                 });
         });
+
+        it(`is given a different comment limit`, () => {
+            // Arrange
+            server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
+            var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
+
+            let mockSqReportProcessor: MockSonarQubeReportProcessor = new MockSonarQubeReportProcessor();
+            let messages = new Array<Message>(10);
+            // Set 10 messages to return
+            for (var i = 0; i < 10; i++) {
+                messages.push(new Message('bar', 'src/main/java/com/mycompany/app/App.java', 1, 1));
+            }
+            mockSqReportProcessor.SetCommentsToReturn(messages);
+
+            // Act
+            let orchestrator: PrcaOrchestrator =
+                new PrcaOrchestrator(testLogger, mockSqReportProcessor, server, 5); // set a message limit of 5
+
+            return orchestrator.postSonarQubeIssuesToPullRequest(sqReportPath)
+                .then(() => {
+                    // Assert
+                    expect(server.getSavedMessages()).to.have.length(orchestrator.messageLimit, 'Correct number of comments');
+
+                    var correctThreads = server.getSavedMessages().filter(
+                        (message: Message) => {
+                            return message.content == 'bar';
+                        }
+                    );
+                    expect(correctThreads).to.have.length(orchestrator.messageLimit, 'All posted comments had correct content');
+                });
+        });
+
+
     });
 });

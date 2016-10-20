@@ -42,8 +42,9 @@ export class MockPrcaService implements IPrcaService {
             if (shouldFail) {
                 reject(new Error('mock failure when getting modified files in the PR'));
             }
-
-            resolve(modifiedFiles);
+            else {
+                resolve(modifiedFiles); 
+            }
         })
     }
 
