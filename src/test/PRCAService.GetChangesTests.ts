@@ -2,7 +2,7 @@
 * Tests for GetChanges
  */
 
-import { PRCAService} from '../module/PRCAService';
+import { PrcaService} from '../module/PRCAService';
 import { TestLogger } from './TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
 import {ErrorTarget} from './mocks/ErrorTarget';
@@ -29,7 +29,7 @@ describe('PRCA Service ', () => {
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
             let logger: TestLogger = new TestLogger();
-            let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+            let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
             mockGitApi.configurePRIterations([1]);
             mockGitApi.configurePrIterationChanges(1, ['file1.cs', 'file2.cs']);
@@ -46,7 +46,7 @@ describe('PRCA Service ', () => {
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
             let logger: TestLogger = new TestLogger();
-            let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+            let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
             mockGitApi.configurePRIterations([1, 3, 5, 7]);
             mockGitApi.configurePrIterationChanges(1, ['file1.cs', 'file2.cs']);
@@ -66,7 +66,7 @@ describe('PRCA Service ', () => {
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
             let logger: TestLogger = new TestLogger();
-            let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+            let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
             mockGitApi.configurePRIterations([1, 2]);
             mockGitApi.configurePrIterationChanges(1, ['file1.cs', 'file2.cs']);
@@ -87,7 +87,7 @@ describe('PRCA Service ', () => {
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
             let logger: TestLogger = new TestLogger();
-            let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+            let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
             mockGitApi.configurePRIterations([1, 2]);
             mockGitApi.configurePrIterationChanges(1, ['file1.cs', 'file2.cs']);

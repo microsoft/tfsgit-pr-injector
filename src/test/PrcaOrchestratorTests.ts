@@ -32,8 +32,8 @@ describe('The PRCA Orchestrator', () => {
     context('fails when it', () => {
         let testLogger: TestLogger;
         let server: MockPrcaService;
-        let sqReportProcessor:SonarQubeReportProcessor;
-        let orchestrator:PrcaOrchestrator; // object under test
+        let sqReportProcessor: SonarQubeReportProcessor;
+        let orchestrator: PrcaOrchestrator; // object under test
 
         beforeEach(() => {
             testLogger = new TestLogger();
@@ -43,10 +43,12 @@ describe('The PRCA Orchestrator', () => {
         });
 
         it('is called with invalid arguments', () => {
+            var message: any = undefined;
+
             // Arrange
             var expectedMessages: Message[] = [fakeMessage, fakeMessage];
             server.createCodeAnalysisThreads(expectedMessages); // post some messages to test that the orchestrator doesn't delete them
-            
+
             // Act & Assert
             expect(() => orchestrator.postSonarQubeIssuesToPullRequest(undefined)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
             expect(() => orchestrator.postSonarQubeIssuesToPullRequest(null)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
@@ -112,7 +114,7 @@ describe('The PRCA Orchestrator', () => {
         let testLogger: TestLogger;
         let server: MockPrcaService;
         let sqReportProcessor: SonarQubeReportProcessor;
-        let orchestrator:PrcaOrchestrator; // object under test
+        let orchestrator: PrcaOrchestrator; // object under test
 
         beforeEach(() => {
             testLogger = new TestLogger();

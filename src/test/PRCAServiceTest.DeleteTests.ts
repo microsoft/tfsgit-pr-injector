@@ -5,7 +5,7 @@
 * Test driver
  */
 
-import { PRCAService} from '../module/PRCAService';
+import { PrcaService} from '../module/PRCAService';
 import { Message } from '../module/Message';
 import { TestLogger } from './TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
@@ -28,14 +28,13 @@ var mochaAsync = (fn: Function) => {
 };
 
 
-
 context('deleteCodeAnalysisComments', () => {
-    it('works in conjunction with createCodeAnalysisThreads', mochaAsync(async (done: Function) => {
+    it('works in conjunction with createCodeAnalysisThreads', async (done: Function) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1]);
         let message1 = new Message('bla bla', 'file1.cs', 14, 2);
@@ -49,35 +48,14 @@ context('deleteCodeAnalysisComments', () => {
         var threads = mockGitApi.ExistingThreads;
         chai.expect(threads).to.have.length(2);
         ConfigurableGitApi.validateThreadsAreDeleted(threads);
-    }));
+    });
 
-    it('ignores user threads', mochaAsync(async (done: Function) => {
-
-        // Arrange
-        let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
-        let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
-
-        mockGitApi.configurePRIterations([1]);
-        let message1 = new Message('bla bla', 'file1.cs', 14, 2);
-        let message2 = new Message('bla bla', 'file1.cs', 14, 2);
-
-        // Act
-        await prcaService.createCodeAnalysisThreads([message1, message2]);
-        await prcaService.deleteCodeAnalysisComments();
-
-        // Assert
-        var threads = mockGitApi.ExistingThreads;
-        chai.expect(threads).to.have.length(2);
-        ConfigurableGitApi.validateThreadsAreDeleted(threads);
-    }));
-
-    it('does not fail if getPullRequestIterations fails the latest iteration value is cached', mochaAsync(async (done: Function) => {
+    it('does not fail if getPullRequestIterations fails', mochaAsync(async (done: Function) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1]);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
@@ -97,7 +75,7 @@ context('deleteCodeAnalysisComments', () => {
 
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1]);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
@@ -118,7 +96,7 @@ context('deleteCodeAnalysisComments', () => {
 
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1]);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
@@ -135,7 +113,7 @@ context('deleteCodeAnalysisComments', () => {
         }
     }));
 
-    it('existing user comments', mochaAsync(async (done: Function) => {
+    it('works with a complex thread setup', mochaAsync(async (done: Function) => {
 
         // This is a complex setup taken from a real network capture. The threads look like this:
         // 
@@ -150,7 +128,7 @@ context('deleteCodeAnalysisComments', () => {
 
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
         mockGitApi.configurePRIterations([1]);
 
         let serializedThreadsAndCommentsFile = path.join(__dirname, 'data', 'threadsAndComments.json');
@@ -167,8 +145,4 @@ context('deleteCodeAnalysisComments', () => {
         ConfigurableGitApi.validateThreadIsNotDeleted(mockGitApi.ExistingThreads.find(t => t.id === 1058));
         ConfigurableGitApi.validateThreadIsNotDeleted(mockGitApi.ExistingThreads.find(t => t.id === 1064));
     }));
-
-
 });
-
-

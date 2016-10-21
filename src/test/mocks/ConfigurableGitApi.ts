@@ -2,7 +2,7 @@ import { IGitApi } from 'vso-node-api/GitApi';
 import * as GitInterfaces from 'vso-node-api/interfaces/GitInterfaces';
 import {IdentityRef }from 'vso-node-api/interfaces/common/VSSInterfaces';
 import {ErrorTarget} from './ErrorTarget';
-import { PRCAService} from '../../module/PRCAService';
+import { PrcaService} from '../../module/PRCAService';
 import { Message } from '../../module/Message';
 import * as chai from 'chai';
 
@@ -154,8 +154,8 @@ export class ConfigurableGitApi implements IGitApi {
             throw new Error('Test issue: Optional parameters are not supported by the mock');
         }
 
-        if (commentThread.properties[PRCAService.PRCACommentDescriptor].value === 1) {
-            commentThread.properties[PRCAService.PRCACommentDescriptor] = {
+        if (commentThread.properties[PrcaService.PrcaCommentDescriptor].value === 1) {
+            commentThread.properties[PrcaService.PrcaCommentDescriptor] = {
                 $type: 'System.Int32',
                 $value: 1
             };
@@ -254,7 +254,7 @@ export class ConfigurableGitApi implements IGitApi {
         thread: GitInterfaces.GitPullRequestCommentThread,
         latestIterationId: number) {
 
-        var prcaPropertyName = PRCAService.PRCACommentDescriptor;
+        var prcaPropertyName = PrcaService.PrcaCommentDescriptor;
         chai.expect(thread.comments).to.have.length(1, 'Expecting a single comment on a thread');
         chai.expect(thread.comments[0].commentType).to.equal(GitInterfaces.CommentType.Text, 'Expected the comment to be of type text');
         chai.expect(thread.comments[0].isDeleted).to.equal(false, 'Expecting the comment to not be marked as deleted');

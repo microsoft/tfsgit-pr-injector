@@ -3,7 +3,7 @@
  */
 
 import { IGitApi } from 'vso-node-api/GitApi';
-import { PRCAService} from '../module/PRCAService';
+import { PrcaService} from '../module/PRCAService';
 import { Message } from '../module/Message';
 import { TestLogger } from './TestLogger';
 import * as web from 'vso-node-api/WebApi';
@@ -28,7 +28,7 @@ xit('Real web calls using token, no assertions!', async (done) => {
     let vstsGit: IGitApi = connection.getGitApi();
 
     let logger: TestLogger = new TestLogger();
-    let prcaService: PRCAService = new PRCAService(logger, vstsGit, repoId, prId);
+    let prcaService: PrcaService = new PrcaService(logger, vstsGit, repoId, prId);
     try {
         await prcaService.createCodeAnalysisThreads([new Message('Foo', '/Extractor/Program.cs', 1, 5)]);
         await prcaService.createCodeAnalysisThreads([new Message('Bar', '/ConsoleApplication1/App.config', 3, 1)]);

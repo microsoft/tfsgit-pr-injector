@@ -2,7 +2,7 @@
 * Tests for creating threads
  */
 
-import { PRCAService} from '../module/PRCAService';
+import { PrcaService} from '../module/PRCAService';
 import { Message } from '../module/Message';
 import { TestLogger } from './TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
@@ -21,15 +21,13 @@ var mochaAsync = (fn: Function) => {
     };
 };
 
-
-
 context('createCodeAnalysisThreads', () => {
-    it('works when posting a messages', mochaAsync(async (done: Function) => {
+    it('works when posting a single message', mochaAsync(async (done: Function) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1]);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
@@ -48,26 +46,7 @@ context('createCodeAnalysisThreads', () => {
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
-
-        mockGitApi.configurePRIterations([1]);
-        let message = new Message('bla bla', 'file1.cs', 14, 2);
-
-        // Act
-        await prcaService.createCodeAnalysisThreads([message]);
-
-        // Assert
-        var threads = mockGitApi.ExistingThreads;
-        chai.expect(threads).to.have.length(1);
-        ConfigurableGitApi.validateThreadAgainstMessge(message, threads[0], 1);
-    }));
-
-    it('works when posting several messages', mochaAsync(async (done: Function) => {
-
-        // Arrange
-        let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
-        let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
 
         mockGitApi.configurePRIterations([1, 2, 3]);
 
@@ -90,7 +69,7 @@ context('createCodeAnalysisThreads', () => {
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
 
         mockGitApi.configurePRIterations([1]);
@@ -112,7 +91,7 @@ context('createCodeAnalysisThreads', () => {
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
         let logger: TestLogger = new TestLogger();
-        let prcaService: PRCAService = new PRCAService(logger, mockGitApi, 'repoId', 15);
+        let prcaService: PrcaService = new PrcaService(logger, mockGitApi, 'repoId', 15);
         let message = new Message('bla bla', 'file1.cs', 14, 2);
 
         mockGitApi.configurePRIterations([1]);
