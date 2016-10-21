@@ -79,4 +79,15 @@ export class Message {
         return this._priority;
     }
 
+    /**
+     * Returns a string representation fo the message, useful for outputting in the logs / errors
+     * 
+     * @returns {string}
+     * 
+     * @memberOf Message
+     */
+    public toString() : string {
+        return JSON.stringify(this, null, 4);
+    }
+
 }
