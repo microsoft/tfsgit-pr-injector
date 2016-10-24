@@ -1,7 +1,7 @@
 {
   "name": "tfsgit-pr-injector",
   "version": "0.1.0",
-  "description": "This module is responsible for injecting comments to a Tts Git (i.e. VSTS, TFS on premise servers) pull request. It should be consumed from a TFS build task. The comment format is simple - content, file path, line and priority. The priority is used to limit the number of commentsone can push to a PR.The module also comes with an adaptor that parses a SonarQube report and extracts code analysis issues (may be moved to a separate module in the future).",
+  "description": "This is a reference implementation and not a supported API. This module is responsible for injecting comments to a Tts Git (i.e. VSTS, TFS on premise servers) pull request. It should be consumed from a TFS build task. The comment format is simple - content, file path, line and priority. The priority is used to limit the number of comments one can push to a PR. ",
   "main": "./task.js",
   "scripts": {
     "info": "npm-scripts-info",
