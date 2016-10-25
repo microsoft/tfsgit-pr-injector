@@ -19,7 +19,8 @@
     "?test:watch": "Watch for changed compiled TypeScript files and perform unit tests. Press Ctrl-Shift-B in VSCode to compile TypeScript.",
     "test:watch": "mocha --watch ./bin/*/*.js",
     "?cleanall": "Removes the node_modules & typings, all compiled TypeScript files, and coverage reports.",
-    "cleanall": "rimraf ./coverage ./bin ./typings ./node_modules"
+    "cleanall": "rimraf ./coverage ./bin ./typings ./node_modules",
+    "package": "ncp ./src/module ./bin/package && cp ./package.json ./bin/package"
   },
   "repository": {
     "type": "git",
