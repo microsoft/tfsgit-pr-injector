@@ -2,10 +2,15 @@
 
 import * as path from 'path';
 
+import * as web from 'vso-node-api/WebApi';
+import { WebApi } from 'vso-node-api/WebApi';
+
 import { ILogger } from './ILogger';
 import { Message } from './Message';
 import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
+import { SonarQubeReportProcessor } from './SonarQubeReportProcessor';
 import { IPrcaService } from './IPrcaService';
+import { PrcaService } from './PrcaService';
 
 /**
  * PRCA (Pull Request Code Analysis) Orchestrator
@@ -109,6 +114,17 @@ export class PrcaOrchestrator {
         result = result.slice(0, this.messageLimit);
 
         return result;
+    }
+
+    /* Static methods */
+
+    public static CreatePrcaOrchestrator(logger: ILogger, collectionUrl: string, token: string, repositoryId: string, pullRequestId: number): PrcaOrchestrator {
+        let creds = web.getPersonalAccessTokenHandler(token);
+        var connection = new WebApi(collectionUrl, creds);
+
+        let prcaService: IPrcaService = new PrcaService(logger, connection.getGitApi(), repositoryId, pullRequestId);
+        let reportProcessor: ISonarQubeReportProcessor = new SonarQubeReportProcessor(logger);
+        return new PrcaOrchestrator(logger, reportProcessor, prcaService);
     }
 
 }
