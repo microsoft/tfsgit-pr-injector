@@ -2,10 +2,15 @@
 
 import * as path from 'path';
 
+import * as web from 'vso-node-api/WebApi';
+import { WebApi } from 'vso-node-api/WebApi';
+
 import { ILogger } from './ILogger';
 import { Message } from './Message';
 import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
+import { SonarQubeReportProcessor } from './SonarQubeReportProcessor';
 import { IPrcaService } from './IPrcaService';
+import { PrcaService } from './PrcaService';
 
 /**
  * PRCA (Pull Request Code Analysis) Orchestrator
@@ -21,6 +26,14 @@ export class PrcaOrchestrator {
 
     private messageLimit: number = 100;
 
+    /**
+     * This constructor gives full control of the ISonarQubeReportProcessor and IPrcaService.
+     * If such control isn't required, see the static method PrcaOrchestrator.CreateOrchestrator() below.
+     * @param logger Platform-independent logging
+     * @param sqReportProcessor Parses report files into Message objects
+     * @param PrcaService Handles interaction with the serverside
+     * @param messageLimit (Optional) A limit to the number of messages posted for performance and experience reasons.
+     */
     constructor(private logger:ILogger, sqReportProcessor:ISonarQubeReportProcessor, PrcaService:IPrcaService, messageLimit?: number) {
         if (sqReportProcessor === null || sqReportProcessor === undefined) {
             throw new ReferenceError('sqReportProcessor');
@@ -35,6 +48,31 @@ export class PrcaOrchestrator {
         if (messageLimit != null && messageLimit != undefined) {
             this.messageLimit = messageLimit;
         }
+    }
+
+    /**
+     * This static constructor is intended for general-use creation of PrcaOrchestrator instances.
+     * @param logger Platform-independent logging
+     * @param collectionUrl The URL of the server
+     * @param token Authentication token
+     * @param repositoryId Internal ID of the repository
+     * @param pullRequestId Internal ID of the pull request
+     * @returns {PrcaOrchestrator}
+     */
+    public static CreatePrcaOrchestrator(logger: ILogger, collectionUrl: string, token: string, repositoryId: string, pullRequestId: number): PrcaOrchestrator {
+        if (collectionUrl == null) {
+            throw new ReferenceError('collectionUrl');
+        }
+        if (token == null) {
+            throw new ReferenceError('token');
+        }
+
+        let creds = web.getPersonalAccessTokenHandler(token);
+        var connection = new WebApi(collectionUrl, creds);
+
+        let prcaService: IPrcaService = new PrcaService(logger, connection.getGitApi(), repositoryId, pullRequestId);
+        let reportProcessor: ISonarQubeReportProcessor = new SonarQubeReportProcessor(logger);
+        return new PrcaOrchestrator(logger, reportProcessor, prcaService);
     }
 
     /**
