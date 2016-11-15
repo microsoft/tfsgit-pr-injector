@@ -29,7 +29,7 @@ var mochaAsync = (fn: Function) => {
 
 
 context('deleteCodeAnalysisComments', () => {
-    it('works in conjunction with createCodeAnalysisThreads', async (done: Function) => {
+    it('works in conjunction with createCodeAnalysisThreads', mochaAsync(async (done: Function) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
@@ -48,7 +48,7 @@ context('deleteCodeAnalysisComments', () => {
         var threads = mockGitApi.ExistingThreads;
         chai.expect(threads).to.have.length(2);
         ConfigurableGitApi.validateThreadsAreDeleted(threads);
-    });
+    }));
 
     it('does not fail if getPullRequestIterations fails', mochaAsync(async (done: Function) => {
 
