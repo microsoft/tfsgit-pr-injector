@@ -1,13 +1,14 @@
+/// <reference path="../../../typings/index.d.ts" />
+
 import { IGitApi } from 'vso-node-api/GitApi';
 import * as GitInterfaces from 'vso-node-api/interfaces/GitInterfaces';
 import {IdentityRef }from 'vso-node-api/interfaces/common/VSSInterfaces';
 import {ErrorTarget} from './ErrorTarget';
-import { PrcaService} from '../../module/PRCAService';
-import { Message } from '../../module/Message';
+import { PrcaService} from '../../module/prca/PRCAService';
+import { Message } from '../../module/prca/Message';
 import * as chai from 'chai';
 
 /* tslint:disable:max-line-length */
-
 
 
 /**

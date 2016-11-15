@@ -1,9 +1,11 @@
+/// <reference path="../../typings/index.d.ts" />
+
 /**
 * Tests for GetChanges
  */
 
-import { PrcaService} from '../module/PRCAService';
-import { TestLogger } from './TestLogger';
+import { PrcaService} from '../module/prca/PRCAService';
+import { TestLogger } from './mocks/TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
 import {ErrorTarget} from './mocks/ErrorTarget';
 

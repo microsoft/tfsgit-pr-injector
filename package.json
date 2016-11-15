@@ -11,7 +11,7 @@
     "tslint": "tslint ./src/**/*.ts --force",
     "compile": "tsc --pretty",
     "?test": "Run TSLint, compile TypeScript, run unit tests, and create coverage reports.",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec ./bin/test/*.js",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec ./bin/test/**/*.js",    
     "test:copyData": "ncp ./src/test/data ./bin/test/data",
     "posttest": "npm run remap:lcov && npm run remap:html",
     "remap:lcov": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov-ts.info",
@@ -51,8 +51,11 @@
   },
   "dependencies": {
     "fs": "0.0.2",
+    "glob": "^7.1.1",
     "npm-scripts-info": "^0.3.6",
+    "q": "^1.4.1",
     "util": "^0.10.3",
-    "vso-node-api": "^5.0.5"
+    "vso-node-api": "^5.0.5",
+    "vsts-task-lib": "^1.1.0"
   }
 }

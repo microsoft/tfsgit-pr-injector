@@ -28,7 +28,6 @@ export interface IPrcaService {
      */
     deleteCodeAnalysisComments(): Promise<void>;
 
-
     /**
      * Gets a list of files that were modified in the PR.
      * 

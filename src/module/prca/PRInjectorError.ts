@@ -1,3 +1,5 @@
+/* tslint:disable:no-constructor-vars */
+
 /**
  * Describes the errors thrown by this node module
  * 

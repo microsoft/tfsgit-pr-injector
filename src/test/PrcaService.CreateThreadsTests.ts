@@ -1,10 +1,12 @@
+/// <reference path="../../typings/index.d.ts" />
+
 /**
 * Tests for creating threads
  */
 
-import { PrcaService} from '../module/PRCAService';
-import { Message } from '../module/Message';
-import { TestLogger } from './TestLogger';
+import { PrcaService} from '../module/prca/PRCAService';
+import { Message } from '../module/prca/Message';
+import { TestLogger } from './mocks/TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
 import {ErrorTarget} from './mocks/ErrorTarget';
 

@@ -1,13 +1,11 @@
 /// <reference path="../../typings/index.d.ts" />
 
-
 /**
 * Test driver
  */
-
-import { PrcaService} from '../module/PRCAService';
-import { Message } from '../module/Message';
-import { TestLogger } from './TestLogger';
+import { PrcaService} from '../module/prca/PRCAService';
+import { Message } from '../module/prca/Message';
+import { TestLogger } from './mocks/TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
 import {ErrorTarget} from './mocks/ErrorTarget';
 
@@ -29,7 +27,7 @@ var mochaAsync = (fn: Function) => {
 
 
 context('deleteCodeAnalysisComments', () => {
-    it('works in conjunction with createCodeAnalysisThreads', async (done: Function) => {
+    it('works in conjunction with createCodeAnalysisThreads', mochaAsync(async (done: Function) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
@@ -48,7 +46,7 @@ context('deleteCodeAnalysisComments', () => {
         var threads = mockGitApi.ExistingThreads;
         chai.expect(threads).to.have.length(2);
         ConfigurableGitApi.validateThreadsAreDeleted(threads);
-    });
+    }));
 
     it('does not fail if getPullRequestIterations fails', mochaAsync(async (done: Function) => {
 
@@ -87,7 +85,7 @@ context('deleteCodeAnalysisComments', () => {
             await prcaService.deleteCodeAnalysisComments();
             done('Expected createCodeAnalysisThreads to have failed');
         } catch (e) {
-            chai.expect(e.message).to.equal(ConfigurableGitApi.ExpectedExceptionText)
+            chai.expect(e.message).to.equal(ConfigurableGitApi.ExpectedExceptionText);
             done();
         }
     }));
@@ -108,7 +106,7 @@ context('deleteCodeAnalysisComments', () => {
             await prcaService.deleteCodeAnalysisComments();
             done('Expected createCodeAnalysisThreads to have failed');
         } catch (e) {
-            chai.expect(e.message).to.equal(ConfigurableGitApi.ExpectedExceptionText)
+            chai.expect(e.message).to.equal(ConfigurableGitApi.ExpectedExceptionText);
             done();
         }
     }));

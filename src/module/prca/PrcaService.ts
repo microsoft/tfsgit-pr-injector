@@ -1,4 +1,4 @@
-/// <reference path="../../typings/index.d.ts" />
+/// <reference path="../../../typings/index.d.ts" />
 
 import { IGitApi } from 'vso-node-api/GitApi';
 import * as gitInterfaces from 'vso-node-api/interfaces/GitInterfaces';
@@ -16,15 +16,20 @@ import { IPrcaService } from './IPrcaService';
  */
 export class PrcaService implements IPrcaService {
 
+    private logger: ILogger;
+    private gitApi: IGitApi;
+    private repositoryId: string;
+    private prId: number;
+
     private latestIterationFetched = false;
     private latestIterationId: number = -1;
     public /* for test purposes */ static PrcaCommentDescriptor: string = 'Microsoft.TeamFoundation.CodeAnalysis.PRCA';
 
     constructor(
-        private logger: ILogger,
-        private gitApi: IGitApi,
-        private repositoryId: string,
-        private prId: number) {
+        logger: ILogger,
+        gitApi: IGitApi,
+        repositoryId: string,
+        prId: number) {
 
         if (!logger) {
             throw new ReferenceError('logger');
@@ -38,6 +43,10 @@ export class PrcaService implements IPrcaService {
             throw new ReferenceError('repositoryId');
         }
 
+        this.logger = logger;
+        this.gitApi = gitApi;
+        this.repositoryId = repositoryId;
+        this.prId = prId;
     }
 
     public async createCodeAnalysisThreads(messages: Message[]): Promise<void> {
