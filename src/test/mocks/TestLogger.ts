@@ -1,4 +1,6 @@
-import {ILogger} from '../module/ILogger';
+/// <reference path="../../../typings/index.d.ts" />
+
+import {ILogger} from '../../module/prca/ILogger';
 
 /**
  * Test Logger implementation

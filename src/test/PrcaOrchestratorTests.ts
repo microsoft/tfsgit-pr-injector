@@ -4,16 +4,13 @@
  * Tests for interactions with the server.
  */
 
-import { GitPullRequestCommentThread, Comment } from 'vso-node-api/interfaces/GitInterfaces';
+import { Message } from '../module/prca/Message';
+import { SonarQubeReportProcessor } from '../module/prca/SonarQubeReportProcessor';
+import { PrcaOrchestrator } from '../module/prca/PrcaOrchestrator';
 
-import { Message } from '../module/Message';
-import { SonarQubeReportProcessor } from '../module/SonarQubeReportProcessor';
-import { PrcaService } from '../module/PrcaService';
-import { PrcaOrchestrator } from '../module/PrcaOrchestrator';
-
-import { TestLogger } from './TestLogger';
-import { MockPrcaService } from './MockPrcaService';
-import { MockSonarQubeReportProcessor } from './MockSonarQubeReportProcessor';
+import { TestLogger } from './mocks/TestLogger';
+import { MockPrcaService } from './mocks/MockPrcaService';
+import { MockSonarQubeReportProcessor } from './mocks/MockSonarQubeReportProcessor';
 
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -42,20 +39,8 @@ describe('The PRCA Orchestrator', () => {
             orchestrator = new PrcaOrchestrator(testLogger, sqReportProcessor, server);
         });
 
-        it('is called with invalid arguments', () => {
-            var message: any = undefined;
-
-            // Arrange
-            var expectedMessages: Message[] = [fakeMessage, fakeMessage];
-            server.createCodeAnalysisThreads(expectedMessages); // post some messages to test that the orchestrator doesn't delete them
-
-            // Act & Assert
-            expect(() => orchestrator.postSonarQubeIssuesToPullRequest(undefined)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
-            expect(() => orchestrator.postSonarQubeIssuesToPullRequest(null)).to.throw(Error, /Make sure a SonarQube enabled build task ran before this step./);
-            expect(server.getSavedMessages()).to.eql(expectedMessages, 'Expected existing PRCA messages to still be on the server');
-        });
-
         it('fails retrieving the list of files in the pull request', () => {
+
             // Arrange
             var expectedMessages: Message[] = [fakeMessage, fakeMessage];
             server.createCodeAnalysisThreads(expectedMessages); // post some messages to test that the orchestrator doesn't delete them
@@ -68,11 +53,10 @@ describe('The PRCA Orchestrator', () => {
                     return Promise.reject('Should not have finished successfully');
                 }, (error) => {
                     // We expect to fail
-                    expect(server.getSavedMessages()).to.eql(expectedMessages, 'Expected existing PRCA messages to still be on the server');
+                    expect(server.getSavedMessages().length).to.eql(0, 'The server messages should have been deleted');
                     return Promise.resolve(true);
                 });
         });
-
         it('fails deleting old PRCA comments', () => {
             // Arrange
             var expectedMessages: Message[] = [fakeMessage, fakeMessage];
@@ -158,7 +142,7 @@ describe('The PRCA Orchestrator', () => {
             // Arrange
             var oldMessages: Message[] = [fakeMessage, fakeMessage];
             server.createCodeAnalysisThreads(oldMessages); // post some messages to test that the orchestrator deletes them
-            server.setModifiedFilesInPr(['src/test/java/com/mycompany/app/AppTest.java']);
+            server.setModifiedFilesInPr(['/src/test/java/com/mycompany/app/AppTest.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
@@ -171,7 +155,7 @@ describe('The PRCA Orchestrator', () => {
 
         it('has multiple comments to post', () => {
             // Arrange
-            server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
+            server.setModifiedFilesInPr(['/my-app/src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act
@@ -182,7 +166,7 @@ describe('The PRCA Orchestrator', () => {
                 });
         });
 
-        it(`has more comments to post than the limit allows`, () => {
+        it('has more comments to post than the limit allows', () => {
             // Arrange
             server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
@@ -190,9 +174,9 @@ describe('The PRCA Orchestrator', () => {
             let orchestrator: PrcaOrchestrator =
                 new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
 
-            let messages = new Array<Message>(orchestrator.getMessageLimit() + 50);
+            let messages: Message[] = [];
             // Set (getMessageLimit() + 50) messages to return
-            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i++) {
+            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i = i + 1) {
                 let message: Message;
                 // Some of the messages will have a higher priority, so that we can check that they have all been posted
                 if (i < orchestrator.getMessageLimit() + 30) {
@@ -212,14 +196,14 @@ describe('The PRCA Orchestrator', () => {
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
-                            return message.content == 'bar';
+                            return message.content === 'bar';
                         }
                     );
                     expect(priorityOneThreads).to.have.length(20, 'High priority comments were all posted');
                 });
         });
 
-        it(`has more high-priority comments to post than the limit allows`, () => {
+        it('has more high-priority comments to post than the limit allows', () => {
             // Arrange
             server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
@@ -227,9 +211,9 @@ describe('The PRCA Orchestrator', () => {
             let orchestrator: PrcaOrchestrator =
                 new PrcaOrchestrator(testLogger, mockSqReportProcessor, server);
 
-            let messages = new Array<Message>(orchestrator.getMessageLimit() + 50);
+            let messages: Message[] = [];
             // Set (getMessageLimit() + 50) messages to return
-            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i++) {
+            for (var i = 0; i < orchestrator.getMessageLimit() + 50; i += 1) {
                 let message: Message;
                 // (getMessageLimit() + 20 of the messages are high priority, so we expect all posted messages to be at the highest priority
                 if (i < 30) {
@@ -250,22 +234,22 @@ describe('The PRCA Orchestrator', () => {
 
                     var priorityOneThreads = server.getSavedMessages().filter(
                         (message: Message) => {
-                            return message.content == 'bar';
+                            return message.content === 'bar';
                         }
                     );
                     expect(priorityOneThreads).to.have.length(orchestrator.getMessageLimit(), 'All posted comments were high priority');
                 });
         });
 
-        it(`is given a different comment limit`, () => {
+        it('is given a different comment limit', () => {
             // Arrange
             server.setModifiedFilesInPr(['src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-no-issues.json');
 
             let mockSqReportProcessor: MockSonarQubeReportProcessor = new MockSonarQubeReportProcessor();
-            let messages = new Array<Message>(10);
+            let messages: Message[] = [];
             // Set 10 messages to return
-            for (var i = 0; i < 10; i++) {
+            for (var i = 0; i < 10; i += 1) {
                 messages.push(new Message('bar', 'src/main/java/com/mycompany/app/App.java', 1, 1));
             }
             mockSqReportProcessor.SetCommentsToReturn(messages);
@@ -281,13 +265,11 @@ describe('The PRCA Orchestrator', () => {
 
                     var correctThreads = server.getSavedMessages().filter(
                         (message: Message) => {
-                            return message.content == 'bar';
+                            return message.content === 'bar';
                         }
                     );
                     expect(correctThreads).to.have.length(orchestrator.getMessageLimit(), 'All posted comments had correct content');
                 });
         });
-
-
     });
 });

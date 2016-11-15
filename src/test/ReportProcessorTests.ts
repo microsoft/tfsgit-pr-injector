@@ -1,12 +1,13 @@
+/// <reference path="../../typings/index.d.ts" />
+
 /**
  * Tests for the CommentInjector protocol.
  */
 
-import { SonarQubeReportProcessor } from '../module/SonarQubeReportProcessor';
-import { PRInjectorError } from '../module/PRInjectorError';
-import { Message } from '../module/Message';
-
-import { TestLogger } from './TestLogger';
+import { SonarQubeReportProcessor } from '../module/prca/SonarQubeReportProcessor';
+import { PRInjectorError } from '../module/prca/PRInjectorError';
+import { Message } from '../module/prca/Message';
+import { TestLogger } from './mocks/TestLogger';
 
 import * as chai from 'chai';
 import * as path from 'path';
@@ -26,7 +27,7 @@ function VerifyMessage(
 }
 
 describe('The SonarQube Report Processor', () => {
-    context('Fails when', () => {
+    context('fails when', () => {
         let sqReportProcessor: SonarQubeReportProcessor;
         let testLogger: TestLogger;
 
@@ -51,7 +52,7 @@ describe('The SonarQube Report Processor', () => {
         });
     });
 
-    context('Succeeds when', () => {
+    context('succeeds when', () => {
         let sqReportProcessor: SonarQubeReportProcessor;
         let testLogger: TestLogger;
 
@@ -94,19 +95,19 @@ describe('The SonarQube Report Processor', () => {
             // Assert
             chai.expect(messages).to.have.length(3, 'There are 3 new issues in the report');
 
-            // valid issue
+            // valid issue in a module with a path
             VerifyMessage(
                 messages[0],
                 'Remove this unused "x" local variable. (squid:S1481)',
-                'src/main/java/com/mycompany/app/App.java',
+                '/my-app/src/main/java/com/mycompany/app/App.java',
                 12,
                 3);
 
-            // another valid issue in a different file
+            // another valid issue in a different file, but in a module without a path
             VerifyMessage(
                 messages[1],
                 'Replace this usage of System.out or System.err by a logger. (squid:S106)',
-                'src/test/java/com/mycompany/app/AppTest.java',
+                '/src/test/java/com/mycompany/app/AppTest.java',
                 11,
                 4);
 
@@ -114,7 +115,7 @@ describe('The SonarQube Report Processor', () => {
             VerifyMessage(
                 messages[2],
                 'Bad code right here... (squid:S106)',
-                'src/main/java/com/mycompany/app/App.java',
+                '/my-app/src/main/java/com/mycompany/app/App.java',
                 15,
                 6);
 

@@ -1,7 +1,6 @@
-/// <reference path="../../typings/index.d.ts" />
+import path = require('path');
 
-import * as path from 'path';
-
+import tl = require('vsts-task-lib/task');
 import * as web from 'vso-node-api/WebApi';
 import { WebApi } from 'vso-node-api/WebApi';
 
@@ -21,31 +20,36 @@ import { PrcaService } from './PrcaService';
  */
 export class PrcaOrchestrator {
 
-    private sqReportProcessor:ISonarQubeReportProcessor;
-    private PrcaService:IPrcaService;
-
+    private sqReportProcessor: ISonarQubeReportProcessor;
+    private prcaService: IPrcaService;
+    private logger: ILogger;
     private messageLimit: number = 100;
 
     /**
      * This constructor gives full control of the ISonarQubeReportProcessor and IPrcaService.
      * If such control isn't required, see the static method PrcaOrchestrator.CreateOrchestrator() below.
+     * 
      * @param logger Platform-independent logging
      * @param sqReportProcessor Parses report files into Message objects
-     * @param PrcaService Handles interaction with the serverside
+     * @param prcaService Handles interaction with the serverside
      * @param messageLimit (Optional) A limit to the number of messages posted for performance and experience reasons.
      */
-    constructor(private logger:ILogger, sqReportProcessor:ISonarQubeReportProcessor, PrcaService:IPrcaService, messageLimit?: number) {
-        if (sqReportProcessor === null || sqReportProcessor === undefined) {
+    constructor(logger: ILogger, sqReportProcessor: ISonarQubeReportProcessor, prcaService: IPrcaService, messageLimit?: number) {
+        if (!logger) {
+            throw new ReferenceError('logger');
+        }
+        if (!sqReportProcessor) {
             throw new ReferenceError('sqReportProcessor');
         }
-        if (PrcaService === null || PrcaService === undefined) {
+        if (!prcaService) {
             throw new ReferenceError('PrcaService');
         }
 
+        this.logger = logger;
         this.sqReportProcessor = sqReportProcessor;
-        this.PrcaService = PrcaService;
+        this.prcaService = prcaService;
 
-        if (messageLimit != null && messageLimit != undefined) {
+        if (messageLimit != null && messageLimit !== undefined) {
             this.messageLimit = messageLimit;
         }
     }
@@ -59,20 +63,27 @@ export class PrcaOrchestrator {
      * @param pullRequestId Internal ID of the pull request
      * @returns {PrcaOrchestrator}
      */
-    public static CreatePrcaOrchestrator(logger: ILogger, collectionUrl: string, token: string, repositoryId: string, pullRequestId: number): PrcaOrchestrator {
+    public static Create(
+        logger: ILogger,
+        collectionUrl: string,
+        bearerToken: string,
+        repositoryId: string,
+        pullRequestId: number,
+        messageLimit: number): PrcaOrchestrator {
+
         if (collectionUrl == null) {
             throw new ReferenceError('collectionUrl');
         }
-        if (token == null) {
+        if (bearerToken == null) {
             throw new ReferenceError('token');
         }
 
-        let creds = web.getPersonalAccessTokenHandler(token);
+        let creds = web.getBearerHandler(bearerToken);
         var connection = new WebApi(collectionUrl, creds);
 
         let prcaService: IPrcaService = new PrcaService(logger, connection.getGitApi(), repositoryId, pullRequestId);
         let reportProcessor: ISonarQubeReportProcessor = new SonarQubeReportProcessor(logger);
-        return new PrcaOrchestrator(logger, reportProcessor, prcaService);
+        return new PrcaOrchestrator(logger, reportProcessor, prcaService, messageLimit);
     }
 
     /**
@@ -92,42 +103,61 @@ export class PrcaOrchestrator {
      * @returns {Promise<void>}
      */
     public postSonarQubeIssuesToPullRequest(sqReportPath: string): Promise<void> {
-        this.logger.LogDebug(`SonarQube report path: ${sqReportPath}`);
+        this.logger.LogDebug(`[PRCA] SonarQube report path: ${sqReportPath}`);
         if (sqReportPath === undefined || sqReportPath === null) {
-            throw new Error("Make sure a SonarQube enabled build task ran before this step.");
+            // Looks like: "Make sure a Maven or Gradle ran before this step and SonarQube was enabled."
+            return Promise.reject(tl.loc('Error_NoReportPathFound'));
         }
 
-        var allMessages:Message[] = this.sqReportProcessor.FetchCommentsFromReport(sqReportPath);
-        var messagesToPost:Message[] = null;
-        return this.PrcaService.getModifiedFilesInPr()
+        var allMessages: Message[] = this.sqReportProcessor.FetchCommentsFromReport(sqReportPath);
+        var messagesToPost: Message[] = null;
+        return Promise.resolve()
+            .then(() => {
+                // Delete previous messages
+                return this.prcaService.deleteCodeAnalysisComments()
+                    .catch((error) => {
+                        this.logger.LogDebug(`[PRCA] Failed to delete previous PRCA comments. Reason: ${error}`);
+                        // Looks like: "Failed to delete previous PRCA comments."
+                        return Promise.reject(tl.loc('Info_ResultFail_FailedToDeleteOldComments'));
+                    });
+            })
+            .then(() => {
+                return this.prcaService.getModifiedFilesInPr()
+                    .catch((error) => {
+                        this.logger.LogDebug(`[PRCA] Failed to get the files modified by the pull request. Reason: ${error}`);
+                        // Looks like: "Failed to get the files modified by the pull request."
+                        return Promise.reject(tl.loc('Info_ResultFail_FailedToGetModifiedFiles'));
+                    });
+            })
             .then((filesChanged: string[]) => {
-                this.logger.LogDebug(`${filesChanged.length} changed files in the PR.`);
+                this.logger.LogDebug(`[PRCA] ${filesChanged.length} changed files in the PR: ${filesChanged}`);
+                this.logger.LogDebug(`[PRCA] ${allMessages.length} messages exist before filtering: ${allMessages}`);
 
                 messagesToPost = this.filterMessages(filesChanged, allMessages);
             })
             .then(() => {
-                // Delete previous messages
-                return this.PrcaService.deleteCodeAnalysisComments();
-            })
-            .then(() => {
                 // Create new messages
-                this.logger.LogDebug(`${messagesToPost.length} messages are to be posted.`);
-                return this.PrcaService.createCodeAnalysisThreads(messagesToPost);
+                this.logger.LogDebug(`[PRCA] ${messagesToPost.length} messages are to be posted.`);
+                return this.prcaService.createCodeAnalysisThreads(messagesToPost)
+                    .catch((error) => {
+                        this.logger.LogDebug(`[PRCA] Failed to post new PRCA comments. Reason: ${error}`);
+                        // Looks like: "Failed to post new PRCA comments."
+                        return Promise.reject(tl.loc('Info_ResultFail_FailedToPostNewComments'));
+                    });
             });
     }
 
     /* Helper methods */
- 
 
     private filterMessages(filesChanged: string[], allMessages: Message[]): Message[] {
-        var result: Message[];
-        result = allMessages;
+        let result: Message[];
 
         // Filter by message relating to files that were changed in this PR only
-        result = result.filter(
-            (message:Message) => {
+        result = allMessages.filter(
+            (message: Message) => {
                 // If message.file is in filesChanged
                 for (let fileChanged of filesChanged) {
+
                     // case-insensitive normalising file path comparison
                     if (path.relative(fileChanged, message.file) === '') {
                         return true;
@@ -135,14 +165,14 @@ export class PrcaOrchestrator {
                 }
                 return false;
             });
-        this.logger.LogDebug(`${result.length} messages are for files changed in this PR. ${allMessages.length - result.length} messages are not.`);
+        this.logger.LogDebug(`[PRCA] ${result.length} messages are for files changed in this PR. ${allMessages.length - result.length} messages are not.`);
 
         // Sort messages (Message.compare implements sorting by descending priority)
         result = result.sort(Message.compare);
 
         // Truncate to the first 100 to reduce perf and experience impact of being flooded with messages
         if (result.length > this.messageLimit) {
-            this.logger.LogDebug(`The number of messages posted is limited to ${this.messageLimit}. ${result.length - this.messageLimit} messages will not be posted.`);
+            this.logger.LogDebug(`[PRCA] The number of messages posted is limited to ${this.messageLimit}. ${result.length - this.messageLimit} messages will not be posted.`);
         }
         result = result.slice(0, this.messageLimit);
 

@@ -11,5 +11,4 @@ export enum ErrorTarget {
     createThread,
     deleteComment,
     getThreads
-
 }

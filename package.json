@@ -11,16 +11,14 @@
     "tslint": "tslint ./src/**/*.ts --force",
     "compile": "tsc --pretty",
     "?test": "Run TSLint, compile TypeScript, run unit tests, and create coverage reports.",
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec ./bin/test/*.js",
-    "test:copyData": "ncp ./src/test/data ./bin/test/data",
-    "posttest": "npm run remap:lcov && npm run remap:html",
-    "remap:lcov": "remap-istanbul --input coverage/coverage.json --type lcovonly --output coverage/lcov-ts.info",
-    "remap:html": "remap-istanbul --input coverage/coverage.json --type html --output coverage/lcov-report-ts",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec ./bin/test/**/*.js",
+    "test:copyData": "cpx ./src/test/data/** ./bin/test/data",
     "?test:watch": "Watch for changed compiled TypeScript files and perform unit tests. Press Ctrl-Shift-B in VSCode to compile TypeScript.",
     "test:watch": "mocha --watch ./bin/*/*.js",
     "?cleanall": "Removes the node_modules & typings, all compiled TypeScript files, and coverage reports.",
     "cleanall": "rimraf ./coverage ./bin ./typings ./node_modules",
-    "package": "ncp ./src/module ./bin/package && cp ./package.json ./bin/package"
+    "?package": "Creates the task package. Don't forget to edit the task.json and bump the version number before publishing the task.",
+    "package": "rimraf ./bin/package && cpx ./bin/module/**/*.js ./bin/package && cpx ./task.json ./bin/package && cpx ./icon.png ./bin/package && cpx ./package.json ./bin/package && cd bin/package && npm install --production"
   },
   "repository": {
     "type": "git",
@@ -38,11 +36,10 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
+    "cpx": "^1.5.0",
     "istanbul": "^0.4.3",
     "mocha": "^2.5.3",
     "ncp": "^2.0.0",
-    "remap-istanbul": "^0.6.4",
     "rimraf": "^2.5.2",
     "tslint": "^3.11.0",
     "tslint-microsoft-contrib": "^2.0.7",
@@ -51,8 +48,10 @@
   },
   "dependencies": {
     "fs": "0.0.2",
+    "glob": "^7.1.1",
     "npm-scripts-info": "^0.3.6",
-    "util": "^0.10.3",
-    "vso-node-api": "^5.0.5"
+    "q": "^1.4.1",
+    "vso-node-api": "^5.0.5",
+    "vsts-task-lib": "^1.1.0"
   }
 }

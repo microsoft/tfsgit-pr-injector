@@ -66,10 +66,6 @@
         "indent": false,
         "label-position": true,
         "label-undefined": true,
-        "max-line-length": [
-            true,
-            140
-        ],
         "no-arg": true,
         "no-bitwise": false,
         "no-console": [
@@ -88,7 +84,7 @@
         "no-duplicate-variable": true,
         "no-empty": true,
         "no-eval": false,
-        "no-string-literal": true,
+        "no-string-literal": false,
         "no-switch-case-fall-through": true,
         "trailing-comma": true,
         "no-trailing-whitespace": true,

@@ -7,10 +7,11 @@
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
                 "--timeout=999999",
-                "${workspaceRoot}/bin/*/*.js"
-                ],
+                "${workspaceRoot}/bin/test/**/*.js"
+            ],
             "cwd": "${workspaceRoot}",
             "sourceMaps": true,
+            "stopOnEntry": false,
             "outDir": "${workspaceRoot}/bin"
         }
     ]
