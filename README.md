@@ -6,15 +6,15 @@ This is a TFS Build task that will post issues detected by a SonarQube increment
 Dev: 
 
 - install node
-- "npm install" to install all the dependencies
-- "npm run info" for a description of all the scripts
+- `npm install` to install all the dependencies
+- `npm run info` for a description of all the scripts
 - building and debugging tests work from inside VSCode - build (ctrl+shift+b) will transpile the ts and you can F5 into a mocha test
-- "npr run test" will build and run all the tests
+- `npm run test` will build and run all the tests
 - to try out the VSTS Git API endpoint, have a look at the PrcaService.DriverTest
 
 Packaging: 
 
-- "npm run package" bundles all the files that form this build task
+- `npm run package` bundles all the files that form this build task
 - to test the task on your own account, install it using the tfx-cli utility https://www.npmjs.com/package/tfx-cli
 
 
