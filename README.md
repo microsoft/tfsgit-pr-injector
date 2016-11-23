@@ -14,7 +14,9 @@ Dev:
 
 Packaging: 
 
+- make sure to have installed all dependencies and to have built the project ('npm install' and 'npm run test' will do it)
 - `npm run package` bundles all the files that form this build task
+- the task is in bin/package
 - to test the task on your own account, install it using the tfx-cli utility https://www.npmjs.com/package/tfx-cli
 
 
