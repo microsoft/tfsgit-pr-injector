@@ -15,14 +15,12 @@ import { MockSonarQubeReportProcessor } from './mocks/MockSonarQubeReportProcess
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as path from 'path';
-import * as Q from 'q';
 
 describe('The PRCA Orchestrator', () => {
 
     let fakeMessage: Message = new Message('foo bar', './foo/bar.txt', 1, 1);
 
     before(() => {
-        Q.longStackSupport = true;
         chai.should();
     });
 
@@ -155,7 +153,7 @@ describe('The PRCA Orchestrator', () => {
 
         it('has multiple comments to post', () => {
             // Arrange
-            server.setModifiedFilesInPr(['/my-app/src/main/java/com/mycompany/app/App.java']);
+            server.setModifiedFilesInPr(['prefix/my-app/src/main/java/com/mycompany/app/App.java']);
             var sqReportPath: string = path.join(__dirname, 'data', 'sonar-report.json');
 
             // Act

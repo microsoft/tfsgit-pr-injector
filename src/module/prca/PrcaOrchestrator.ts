@@ -1,4 +1,3 @@
-import path = require('path');
 
 import tl = require('vsts-task-lib/task');
 import * as web from 'vso-node-api/WebApi';
@@ -149,19 +148,22 @@ export class PrcaOrchestrator {
 
     /* Helper methods */
 
-    private filterMessages(filesChanged: string[], allMessages: Message[]): Message[] {
+    private filterMessages(filesChangedInPr: string[], allMessages: Message[]): Message[] {
         let result: Message[];
 
         // Filter by message relating to files that were changed in this PR only
         result = allMessages.filter(
             (message: Message) => {
                 // If message.file is in filesChanged
-                for (let fileChanged of filesChanged) {
+                for (let fileChangedInPr of filesChangedInPr) {
 
                     // case-insensitive normalising file path comparison
-                    if (path.relative(fileChanged, message.file) === '') {
+                    if (fileChangedInPr.toLowerCase().endsWith(message.file.toLowerCase())) {
                         return true;
                     }
+                    // if (path.relative(fileChanged, message.file) === '') {
+                    //     return true;
+                    // }
                 }
                 return false;
             });

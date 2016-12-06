@@ -6,6 +6,7 @@ This is a TFS Build task that will post issues detected by a SonarQube increment
 Dev: 
 
 - install node
+- install typescript globally: `npm install -g typescript`
 - `npm install` to install all the dependencies
 - `npm run info` for a description of all the scripts
 - building and debugging tests work from inside VSCode - build (ctrl+shift+b) will transpile the ts and you can F5 into a mocha test
@@ -14,7 +15,7 @@ Dev:
 
 Packaging: 
 
-- make sure to have installed all dependencies and to have built the project (`npm install` and `npm run test` will do it)
+- make sure to have installed all dependencies and to have built the project (`npm install -g typescript`, `npm install` and `npm run test` will do it)
 - `npm run package` bundles all the files that form this build task
 - the task is in bin/package
 - to test the task on your own account, install it using the tfx-cli utility https://www.npmjs.com/package/tfx-cli
