@@ -1,5 +1,5 @@
 import tl = require('vsts-task-lib/task');
-import { ILogger } from './PRCA/ILogger';
+import { ILogger } from './prca/ILogger';
 
 /**
  * The task specific logger

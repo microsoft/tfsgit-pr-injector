@@ -6,14 +6,14 @@
  */
 
 import { IGitApi } from 'vso-node-api/GitApi';
-import { PrcaService} from '../module/prca/PRCAService';
+import { PrcaService} from '../module/prca/PrcaService';
 import { Message } from '../module/prca/Message';
 import { TestLogger } from './mocks/TestLogger';
 import * as web from 'vso-node-api/WebApi';
 import { WebApi } from 'vso-node-api/WebApi';
 
 // xit() means the test will not get executed (it will be marked as pending). Use it() to execute.
-xit('Real web calls using token, no assertions!', async (done) => {
+xit('Real web calls using token, no assertions!', async (done : Function) => {
 
     // uncomment these lines if you want to use Fiddler to capture the traffic
     // process.env.https_proxy = 'http://127.0.0.1:8888';

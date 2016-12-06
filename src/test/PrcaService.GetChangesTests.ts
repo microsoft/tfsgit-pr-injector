@@ -4,7 +4,7 @@
 * Tests for GetChanges
  */
 
-import { PrcaService} from '../module/prca/PRCAService';
+import { PrcaService} from '../module/prca/PrcaService';
 import { TestLogger } from './mocks/TestLogger';
 import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
 import {ErrorTarget} from './mocks/ErrorTarget';
@@ -63,7 +63,7 @@ describe('PRCA Service ', () => {
             chai.expect(files.sort()).to.eql(['file1.cs', 'file2.cs', 'file3.cs', 'file5.cs']);
         }));
 
-        it('fails if getPullRequestIterations also fails', async (done) => {
+        it('fails if getPullRequestIterations also fails', async (done : Function) => {
 
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();
@@ -84,7 +84,7 @@ describe('PRCA Service ', () => {
             }
         });
 
-        it('fails if getPullRequestIterationChanges also fails', async (done) => {
+        it('fails if getPullRequestIterationChanges also fails', async (done : Function) => {
 
             // Arrange
             let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();

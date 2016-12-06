@@ -66,7 +66,7 @@ context('createCodeAnalysisThreads', () => {
         ConfigurableGitApi.validateThreadAgainstMessge(message3, mockGitApi.ExistingThreads[2], 3);
     }));
 
-    it('fails if getPullRequestIterations fails', async (done) => {
+    it('fails if getPullRequestIterations fails', async (done : any) => {
 
         // Arrange
         let mockGitApi: ConfigurableGitApi = new ConfigurableGitApi();

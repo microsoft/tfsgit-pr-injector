@@ -3,11 +3,11 @@
 /**
 * Test driver
  */
-import { PrcaService} from '../module/prca/PRCAService';
+import { PrcaService} from '../module/prca/PrcaService';
 import { Message } from '../module/prca/Message';
 import { TestLogger } from './mocks/TestLogger';
-import {ConfigurableGitApi } from './mocks/ConfigurableGitApi';
-import {ErrorTarget} from './mocks/ErrorTarget';
+import { ConfigurableGitApi } from './mocks/ConfigurableGitApi';
+import { ErrorTarget } from './mocks/ErrorTarget';
 
 import * as path from 'path';
 import * as fs from 'fs';

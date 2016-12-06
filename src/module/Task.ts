@@ -6,7 +6,7 @@ import path = require('path');
 import glob = require('glob');
 
 import tl = require('vsts-task-lib/task');
-import { PrcaOrchestrator } from './PRCA/PrcaOrchestrator';
+import { PrcaOrchestrator } from './prca/PrcaOrchestrator';
 import { TaskLibLogger } from './TaskLibLogger';
 
 tl.setResourcePath(path.join( __dirname, 'task.json'));
