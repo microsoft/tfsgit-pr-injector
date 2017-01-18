@@ -98,7 +98,7 @@ describe('The SonarQube Report Processor', () => {
             // valid issue in a module with a path
             VerifyMessage(
                 messages[0],
-                'Remove this unused "x" local variable. (squid:S1481)',
+                '**_major_**: Remove this unused "x" local variable. (squid:S1481)',
                 '/my-app/src/main/java/com/mycompany/app/App.java',
                 12,
                 3);
@@ -106,7 +106,7 @@ describe('The SonarQube Report Processor', () => {
             // another valid issue in a different file, but in a module without a path
             VerifyMessage(
                 messages[1],
-                'Replace this usage of System.out or System.err by a logger. (squid:S106)',
+                '**_minor_**: Replace this usage of System.out or System.err by a logger. (squid:S106)',
                 '/src/test/java/com/mycompany/app/AppTest.java',
                 11,
                 4);

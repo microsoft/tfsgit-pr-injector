@@ -160,6 +160,12 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         let content: string = `${issue.message} (${issue.rule})`;
         let priority: number = this.getPriority(issue);
 
+        if (priority < 6) {
+            let severity: string = this.getSeverity(priority);
+            content = `**_${severity}_**: ${content}`;
+        }
+
+
         if (!issue.line) {
             this.logger.LogWarning(
                     `A SonarQube issue does not have an associated line and will be ignored. File ${path}. Content ${content}`);
@@ -176,6 +182,23 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         let message: Message = new Message(content, path, line, priority);
         return message;
+    }
+
+    private getSeverity(priority: Number): string {
+        switch(priority) {
+            case 1:
+                return 'blocker';
+            case 2:
+                return 'critical';
+            case 3:
+                return 'major';
+            case 4:
+                return 'minor';
+            case 5:
+                return 'info';
+            default:
+                return 'none';
+        }
     }
 
     private getPriority(issue: any) {
