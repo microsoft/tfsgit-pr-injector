@@ -19,6 +19,13 @@ import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
 export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     private logger: ILogger;
+    private readonly priority_none = 6;
+    private readonly priority_info = 5;
+    private readonly priority_minor = 4;
+    private readonly priority_major = 3;
+    private readonly priority_critical = 2;
+    private readonly priority_blocker = 1;
+
 
     constructor(logger: ILogger) {
         if (!logger) {
@@ -160,11 +167,10 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         let content: string = `${issue.message} (${issue.rule})`;
         let priority: number = this.getPriority(issue);
 
-        if (priority < 6) {
+        if (priority < this.priority_none) {
             let severity: string = this.getSeverity(priority);
             content = `**_${severity}_**: ${content}`;
         }
-
 
         if (!issue.line) {
             this.logger.LogWarning(
@@ -185,16 +191,16 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
     }
 
     private getSeverity(priority: Number): string {
-        switch(priority) {
-            case 1:
+        switch (priority) {
+            case this.priority_blocker:
                 return 'blocker';
-            case 2:
+            case this.priority_critical:
                 return 'critical';
-            case 3:
+            case this.priority_major:
                 return 'major';
-            case 4:
+            case this.priority_minor:
                 return 'minor';
-            case 5:
+            case this.priority_info:
                 return 'info';
             default:
                 return 'none';
@@ -211,17 +217,17 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         switch (severity.toLowerCase()) {
             case 'blocker':
-                return 1;
+                return this.priority_blocker;
             case 'critical':
-                return 2;
+                return this.priority_critical;
             case 'major':
-                return 3;
+                return this.priority_major;
             case 'minor':
-                return 4;
+                return this.priority_minor;
             case 'info':
-                return 5;
+                return this.priority_info;
             default:
-                return 6;
+                return this.priority_none;
         }
     }
 
