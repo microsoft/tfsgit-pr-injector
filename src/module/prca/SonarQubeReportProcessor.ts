@@ -16,6 +16,16 @@ import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
  * @class SonarQubeReportProcessor
  * @implements {ISonarQubeReportProcessor}
  */
+
+enum Priority {
+    blocker = 1,
+    critical,
+    major,
+    minor,
+    info,
+    none
+}
+
 export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     private logger: ILogger;
@@ -156,9 +166,8 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     // todo: filter out assembly level issues ?
     private buildMessage(path: string, issue: any): Message {
-
-        let content: string = `${issue.message} (${issue.rule})`;
         let priority: number = this.getPriority(issue);
+        let content: string = this.buildMessageContent(issue.message, issue.rule, priority);
 
         if (!issue.line) {
             this.logger.LogWarning(
@@ -178,6 +187,36 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         return message;
     }
 
+    private buildMessageContent(message: string, rule: string, priority: number): string {
+        let content: string = '';
+
+        if (priority < Priority.none) {
+            let severity: string = this.getSeverityDisplayName(priority);
+            content = `**_${severity}_**: `;
+        }
+
+        content += `${message} (${rule})`;
+
+        return content;
+    }
+
+    private getSeverityDisplayName(priority: Number): string {
+        switch (priority) {
+            case Priority.blocker:
+                return Priority[Priority.blocker];
+            case Priority.critical:
+                return Priority[Priority.critical];
+            case Priority.major:
+                return Priority[Priority.major];
+            case Priority.minor:
+                return Priority[Priority.minor];
+            case Priority.info:
+                return Priority[Priority.info];
+            default:
+                return Priority[Priority.none];
+        }
+    }
+
     private getPriority(issue: any) {
 
         let severity: string = issue.severity;
@@ -188,17 +227,17 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         switch (severity.toLowerCase()) {
             case 'blocker':
-                return 1;
+                return Priority.blocker;
             case 'critical':
-                return 2;
+                return Priority.critical;
             case 'major':
-                return 3;
+                return Priority.major;
             case 'minor':
-                return 4;
+                return Priority.minor;
             case 'info':
-                return 5;
+                return Priority.info;
             default:
-                return 6;
+                return Priority.none;
         }
     }
 
@@ -225,5 +264,3 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         }
     }
 }
-
-
