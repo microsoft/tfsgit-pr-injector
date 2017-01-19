@@ -16,16 +16,19 @@ import { ISonarQubeReportProcessor } from './ISonarQubeReportProcessor';
  * @class SonarQubeReportProcessor
  * @implements {ISonarQubeReportProcessor}
  */
+
+enum Priority {
+    blocker = 1,
+    critical,
+    major,
+    minor,
+    info,
+    none
+}
+
 export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     private logger: ILogger;
-    private readonly priority_none = 6;
-    private readonly priority_info = 5;
-    private readonly priority_minor = 4;
-    private readonly priority_major = 3;
-    private readonly priority_critical = 2;
-    private readonly priority_blocker = 1;
-
 
     constructor(logger: ILogger) {
         if (!logger) {
@@ -163,14 +166,8 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
     // todo: filter out assembly level issues ?
     private buildMessage(path: string, issue: any): Message {
-
-        let content: string = `${issue.message} (${issue.rule})`;
         let priority: number = this.getPriority(issue);
-
-        if (priority < this.priority_none) {
-            let severity: string = this.getSeverity(priority);
-            content = `**_${severity}_**: ${content}`;
-        }
+        let content: string = this.buildMessageContent(issue.message, issue.rule, priority);
 
         if (!issue.line) {
             this.logger.LogWarning(
@@ -190,20 +187,33 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         return message;
     }
 
-    private getSeverity(priority: Number): string {
+    private buildMessageContent(message: string, rule: string, priority: number): string {
+        let content: string = '';
+
+        if (priority < Priority.none) {
+            let severity: string = this.getSeverityDisplayName(priority);
+            content = `**_${severity}_**: `;
+        }
+
+        content += `${message} (${rule})`;
+
+        return content;
+    }
+
+    private getSeverityDisplayName(priority: Number): string {
         switch (priority) {
-            case this.priority_blocker:
-                return 'blocker';
-            case this.priority_critical:
-                return 'critical';
-            case this.priority_major:
-                return 'major';
-            case this.priority_minor:
-                return 'minor';
-            case this.priority_info:
-                return 'info';
+            case Priority.blocker:
+                return Priority[Priority.blocker];
+            case Priority.critical:
+                return Priority[Priority.critical];
+            case Priority.major:
+                return Priority[Priority.major];
+            case Priority.minor:
+                return Priority[Priority.minor];
+            case Priority.info:
+                return Priority[Priority.info];
             default:
-                return 'none';
+                return Priority[Priority.none];
         }
     }
 
@@ -217,17 +227,17 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         switch (severity.toLowerCase()) {
             case 'blocker':
-                return this.priority_blocker;
+                return Priority.blocker;
             case 'critical':
-                return this.priority_critical;
+                return Priority.critical;
             case 'major':
-                return this.priority_major;
+                return Priority.major;
             case 'minor':
-                return this.priority_minor;
+                return Priority.minor;
             case 'info':
-                return this.priority_info;
+                return Priority.info;
             default:
-                return this.priority_none;
+                return Priority.none;
         }
     }
 
@@ -254,5 +264,3 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         }
     }
 }
-
-
